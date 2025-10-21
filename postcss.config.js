@@ -1,6 +1,7 @@
+// Tailwind v3 (CRA-friendly)
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},   // Tailwind v4 PostCSS plugin
+    tailwindcss: {},
     autoprefixer: {},
   },
 };
