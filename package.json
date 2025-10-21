@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "my-react-app",
+=======
+  "name": "react-login-app",
+>>>>>>> b7c743a (Initial commit - React + Tailwind Login App)
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,7 +13,10 @@
     "@testing-library/user-event": "^13.5.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+<<<<<<< HEAD
     "react-router-dom": "^7.9.4",
+=======
+>>>>>>> b7c743a (Initial commit - React + Tailwind Login App)
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -36,5 +43,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+<<<<<<< HEAD
+=======
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.15",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.15"
+>>>>>>> b7c743a (Initial commit - React + Tailwind Login App)
   }
 }

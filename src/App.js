@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 
@@ -257,3 +258,66 @@ const styles = {
     color: "#333",
   },
 };
+=======
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
+import AccountAdd from "./pages/AccountAdd";
+import Payments from "./pages/Payments";
+import Ops from "./pages/Ops";
+import Reports from "./pages/Reports";
+
+export default function App() {
+  return (
+    <Routes>
+      {/* Public route */}
+      <Route path="/login" element={<Login />} />
+
+      {/* Protected routes */}
+      <Route
+        path="/accounts"
+        element={
+          <ProtectedRoute>
+            <AccountAdd />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payments"
+        element={
+          <ProtectedRoute>
+            <Payments />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ops"
+        element={
+          <ProtectedRoute>
+            <Ops />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Default route */}
+      <Route
+        path="*"
+        element={
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
+>>>>>>> b7c743a (Initial commit - React + Tailwind Login App)

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -11,3 +12,64 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+=======
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --------------------------------------------- */
+/* 🌐 Global Styles - TCS Themed (Blue/Navy Palette) */
+/* --------------------------------------------- */
+
+html, body {
+  @apply bg-[#F7FAFF] text-[#1B1F24] font-sans antialiased;
+}
+
+h1, h2, h3, h4, h5 {
+  @apply text-[#00205C] font-semibold; /* TCS Navy */
+}
+
+a {
+  @apply text-[#2F67A6] hover:text-[#55A3D6] underline-offset-2;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply bg-[#2F67A6] text-white px-4 py-2 rounded-xl font-medium hover:bg-[#00205C] transition;
+}
+
+.btn-secondary {
+  @apply bg-white border border-[#2F67A6] text-[#2F67A6] px-4 py-2 rounded-xl hover:bg-[#E8F1FB] transition;
+}
+
+.btn-cta {
+  @apply bg-[#EC8519] text-white px-4 py-2 rounded-xl font-semibold hover:bg-[#d87414] transition;
+}
+
+/* Cards */
+.card {
+  @apply bg-white shadow-md rounded-2xl border border-[#E4E9F2] p-6;
+}
+
+/* Inputs / Fields */
+input, select {
+  @apply border border-[#C9D4E0] rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#2F67A6] focus:border-[#2F67A6] outline-none;
+}
+
+/* Table (if used on reporting screen) */
+table {
+  @apply w-full text-sm border-collapse;
+}
+
+thead {
+  @apply bg-[#00205C] text-white;
+}
+
+tbody tr:nth-child(even) {
+  @apply bg-[#F0F4FF];
+}
+
+td, th {
+  @apply px-3 py-2 border border-[#D0D7E1];
+}
+>>>>>>> b7c743a (Initial commit - React + Tailwind Login App)
