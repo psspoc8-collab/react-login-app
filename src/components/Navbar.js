@@ -1,18 +1,59 @@
+// src/components/Navbar.js
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const location = useLocation();
   const navigate = useNavigate();
+
+  // Hide navbar on login-related routes
+  if (location.pathname.startsWith("/login")) return null;
+
   return (
-    <nav className="w-full flex items-center justify-end px-8 py-4 bg-white/70 backdrop-blur-md shadow-md rounded-xl mb-6">
-      <div className="flex items-center space-x-8">
-        <Link className="text-sky-700 font-medium text-lg hover:text-sky-900 hover:underline transition" to="/accounts">Accounts</Link>
-        <Link className="text-sky-700 font-medium text-lg hover:text-sky-900 hover:underline transition" to="/payments">Payments</Link>
-        <Link className="text-sky-700 font-medium text-lg hover:text-sky-900 hover:underline transition" to="/ops">OPS</Link>
-        <Link className="text-sky-700 font-medium text-lg hover:text-sky-900 hover:underline transition" to="/reports">Reports</Link>
+    <nav className="bg-gradient-to-r from-sky-600 to-indigo-600 text-white px-6 py-3 flex justify-between items-center shadow-md">
+      <div className="font-semibold text-lg">PSSPOC</div>
+
+      <div className="flex items-center gap-6 text-sm">
+        <Link
+          to="/accounts"
+          className={`hover:text-yellow-300 ${
+            location.pathname === "/accounts" ? "font-bold" : ""
+          }`}
+        >
+          Accounts
+        </Link>
+        <Link
+          to="/payments"
+          className={`hover:text-yellow-300 ${
+            location.pathname === "/payments" ? "font-bold" : ""
+          }`}
+        >
+          Payments
+        </Link>
+        <Link
+          to="/ops"
+          className={`hover:text-yellow-300 ${
+            location.pathname === "/ops" ? "font-bold" : ""
+          }`}
+        >
+          Ops
+        </Link>
+        <Link
+          to="/reports"
+          className={`hover:text-yellow-300 ${
+            location.pathname === "/reports" ? "font-bold" : ""
+          }`}
+        >
+          Reports
+        </Link>
+
+        {/* 🔸 Logout Button */}
         <button
-          onClick={() => { localStorage.removeItem("loggedIn"); navigate("/login"); }}
-          className="ml-6 border border-sky-600 text-sky-700 font-semibold px-5 py-2 rounded-lg hover:bg-sky-50 transition"
+          onClick={() => {
+            localStorage.removeItem("loggedIn");
+            navigate("/login");
+          }}
+          className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition"
         >
           Logout
         </button>
