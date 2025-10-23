@@ -29,3 +29,10 @@ amplify/backend/
 amplify/#amplify-console/
 .aws-sam/
 node_modules/
+
+# OS / installers
+*.pkg
+.DS_Store
+
+# OS / installers
+*.pkg
