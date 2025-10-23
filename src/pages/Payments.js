@@ -1,59 +1,165 @@
-import React from "react";
-import { GradientPage, CenterCard } from "../components/Layout";
+// src/pages/Payments.js
+import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 
 export default function Payments() {
+  const [form, setForm] = useState({
+    payeeName: "",
+    payeeAddress: "",
+    state: "",
+    country: "",
+    zip: "",
+    accountNumber: "",
+    amount: "",
+    type: "debit",
+    source: "",
+    paymentDate: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+
+  const handleClear = () =>
+    setForm({
+      payeeName: "",
+      payeeAddress: "",
+      state: "",
+      country: "",
+      zip: "",
+      accountNumber: "",
+      amount: "",
+      type: "debit",
+      source: "",
+      paymentDate: "",
+    });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Submitting Payment:", form);
+    alert("✅ Payment processed successfully!");
+  };
+
   return (
-    <GradientPage>
-      <CenterCard className="p-10">
-        <Navbar />
-        <h1 className="text-3xl font-bold text-center text-sky-800 mb-3">Payment Processing</h1>
-        <p className="text-gray-600 text-center mb-8 text-lg">Create a debit or credit payment</p>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-white to-indigo-100">
+      {/* Top Navbar */}
+      <Navbar active="payments" />
 
-        <form className="grid grid-cols-1 gap-5 text-lg">
-          <input className="border border-gray-300 rounded-lg p-3" placeholder="Payee Name *" />
-          <input className="border border-gray-300 rounded-lg p-3" placeholder="Account Number *" />
-          <input className="border border-gray-300 rounded-lg p-3" placeholder="Address" />
+      {/* Centered Card */}
+      <div className="flex-grow flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-3xl bg-white rounded-xl shadow-md border border-indigo-100 p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold text-indigo-700 text-center mb-6">
+            Payment Processing
+          </h2>
 
-          <div className="grid grid-cols-2 gap-4">
-            <input className="border border-gray-300 rounded-lg p-3" placeholder="State" />
-            <input className="border border-gray-300 rounded-lg p-3" placeholder="Country" />
-          </div>
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            <input
+              name="payeeName"
+              value={form.payeeName}
+              onChange={handleChange}
+              placeholder="Payee Name"
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400"
+            />
+            <input
+              name="payeeAddress"
+              value={form.payeeAddress}
+              onChange={handleChange}
+              placeholder="Payee Address"
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400"
+            />
 
-          <div className="grid grid-cols-2 gap-4">
-            <input className="border border-gray-300 rounded-lg p-3" placeholder="Zip" />
-            <input className="border border-gray-300 rounded-lg p-3" placeholder="Contact" />
-          </div>
+            <input
+              name="state"
+              value={form.state}
+              onChange={handleChange}
+              placeholder="State"
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400"
+            />
+            <input
+              name="country"
+              value={form.country}
+              onChange={handleChange}
+              placeholder="Country"
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400"
+            />
 
-          <div className="grid grid-cols-2 gap-4">
-            <input className="border border-gray-300 rounded-lg p-3" placeholder="Amount (USD) *" />
-            <select className="border border-gray-300 rounded-lg p-3 bg-white">
-              <option>Debit</option>
-              <option>Credit</option>
+            <input
+              name="zip"
+              value={form.zip}
+              onChange={handleChange}
+              placeholder="ZIP Code"
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400"
+            />
+            <input
+              name="accountNumber"
+              value={form.accountNumber}
+              onChange={handleChange}
+              placeholder="Account Number"
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400"
+            />
+
+            <input
+              name="amount"
+              value={form.amount}
+              onChange={handleChange}
+              placeholder="Amount"
+              type="number"
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400"
+            />
+            <select
+              name="type"
+              value={form.type}
+              onChange={handleChange}
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400"
+            >
+              <option value="debit">Debit</option>
+              <option value="credit">Credit</option>
             </select>
-          </div>
 
-          {/* NEW: Source of Payment */}
-          <select className="border border-gray-300 rounded-lg p-3 bg-white">
-            <option value="">Source of Payment</option>
-            <option>Wire Transfer</option>
-            <option>ACH</option>
-            <option>Internal Transfer</option>
-            <option>Check</option>
-            <option>Cash</option>
-          </select>
+            {/* ✅ Source of Payment full width */}
+            <select
+              name="source"
+              value={form.source}
+              onChange={handleChange}
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400 col-span-1 md:col-span-2"
+            >
+              <option value="">Source of Payment</option>
+              <option value="bank">Bank Transfer</option>
+              <option value="cash">Cash</option>
+              <option value="card">Card</option>
+              <option value="upi">UPI / Wallet</option>
+            </select>
 
-          <input type="date" className="border border-gray-300 rounded-lg p-3" placeholder="Payment Date *" />
+            <input
+              name="paymentDate"
+              value={form.paymentDate}
+              onChange={handleChange}
+              type="date"
+              className="border rounded-lg p-3 focus:ring-2 focus:ring-indigo-400 col-span-1 md:col-span-2"
+            />
 
-          <button type="submit" className="mt-4 bg-sky-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-sky-700">
-            Create Payment
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-10">
-          © 2025 PSSPOC — Built with ❤️ using React & Tailwind CSS
-        </p>
-      </CenterCard>
-    </GradientPage>
+            <div className="col-span-1 md:col-span-2 flex items-center justify-center gap-4 mt-4">
+              <button
+                type="button"
+                onClick={handleClear}
+                className="px-5 py-2 rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+              >
+                Clear
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+              >
+                Submit Payment
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

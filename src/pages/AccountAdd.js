@@ -1,175 +1,235 @@
-// src/pages/AccountAdd.js
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
-// 👉 Set this to your API Gateway invoke URL (no trailing slash)
-const API_BASE = process.env.REACT_APP_API_BASE || "https:UserLoginValidator.execute-api.us-east-1.amazonaws.com";
-
+/**
+ * Account Addition screen (indigo theme, spacious layout)
+ * Persists accounts into localStorage under key: "pss_accounts"
+ */
 export default function AccountAdd() {
-  const navigate = useNavigate();
   const [form, setForm] = useState({
-    userId: "",
-    password: "",
-    confirm: "",
+    accountNumber: "",
+    name: "",
+    address: "",
+    state: "",
+    country: "",
+    zip: "",
+    contact: "",
   });
-  const [showPwd, setShowPwd] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState({ type: "", text: "" });
+  const [msg, setMsg] = useState(null);
+  const [saving, setSaving] = useState(false);
 
-  const update = (k) => (e) => {
-    setMsg({ type: "", text: "" });
-    setForm((s) => ({ ...s, [k]: e.target.value }));
-  };
+  const onChange = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
-  const validate = () => {
-    if (!form.userId.trim()) return "User ID is required.";
-    if (!form.password) return "Password is required.";
-    if (form.password !== form.confirm) return "Passwords do not match.";
-    // optional basic policy
-    if (form.password.length < 6) return "Password must be at least 6 characters.";
+  const resetForm = () =>
+    setForm({
+      accountNumber: "",
+      name: "",
+      address: "",
+      state: "",
+      country: "",
+      zip: "",
+      contact: "",
+    });
+
+  function validate() {
+    if (!form.accountNumber.trim()) return "Account number is required.";
+    if (!/^[0-9A-Za-z\-]+$/.test(form.accountNumber.trim()))
+      return "Account number can contain letters, numbers, and dashes.";
+    if (!form.name.trim()) return "Name is required.";
+    if (form.zip && !/^[0-9A-Za-z\- ]{3,12}$/.test(form.zip))
+      return "ZIP/Postal looks invalid.";
+    if (form.contact && !/^[0-9+\-() ]{7,20}$/.test(form.contact))
+      return "Contact number looks invalid.";
     return null;
-    // You can add more rules (uppercase, number, special char) if you want.
-  };
+  }
 
-  async function signup(e) {
+  function saveToLocalStorage(record) {
+    try {
+      const key = "pss_accounts";
+      const existing = JSON.parse(localStorage.getItem(key) || "[]");
+      // if same accountNumber exists, update it; else push
+      const ix = existing.findIndex(
+        (a) =>
+          (a.accountNumber || "").toLowerCase() ===
+          record.accountNumber.toLowerCase()
+      );
+      if (ix >= 0) {
+        existing[ix] = { ...existing[ix], ...record, updatedAt: Date.now() };
+      } else {
+        existing.push({ ...record, createdAt: Date.now() });
+      }
+      localStorage.setItem(key, JSON.stringify(existing));
+      return true;
+    } catch (e) {
+      console.error("localStorage write failed", e);
+      return false;
+    }
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
+    setMsg(null);
     const err = validate();
     if (err) {
       setMsg({ type: "error", text: err });
       return;
     }
-
-    setLoading(true);
-    setMsg({ type: "", text: "" });
-
-    try {
-      const res = await fetch(`${API_BASE}/auth/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: form.userId.trim(), password: form.password }),
+    setSaving(true);
+    // Local-only persistence for now. (Hook up API here later if needed.)
+    const ok = saveToLocalStorage({
+      accountNumber: form.accountNumber.trim(),
+      name: form.name.trim(),
+      address: form.address.trim(),
+      state: form.state.trim(),
+      country: form.country.trim(),
+      zip: form.zip.trim(),
+      contact: form.contact.trim(),
+    });
+    setSaving(false);
+    if (ok) {
+      setMsg({ type: "success", text: "✅ Account saved successfully." });
+    } else {
+      setMsg({
+        type: "error",
+        text: "Failed to save. Storage is unavailable.",
       });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (res.status === 201 || (res.status === 409 && data?.error === "User already exists")) {
-        setMsg({
-          type: "success",
-          text:
-            res.status === 201
-              ? "✅ User created successfully."
-              : "ℹ️ User already exists. You can log in with these credentials.",
-        });
-        // optional: auto-navigate to login after a moment
-        setTimeout(() => navigate("/login"), 1200);
-      } else {
-        setMsg({ type: "error", text: data?.error || "Signup failed. Check API/CORS and try again." });
-      }
-    } catch (err) {
-      setMsg({ type: "error", text: "Network error. Check your API URL and CORS." });
-    } finally {
-      setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-[calc(100dvh-0px)] bg-gradient-to-br from-indigo-50 via-white to-indigo-100 text-indigo-900">
-      {/* Top Bar */}
-      <header className="sticky top-0 z-10 backdrop-blur bg-white/60 border-b border-indigo-100">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-semibold tracking-tight">Add New User</h1>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate(-1)}
-              className="px-3 py-1.5 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition"
-            >
-              Back
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
-            >
-              Home
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-[100dvh] bg-gradient-to-br from-indigo-50 via-white to-indigo-100 text-indigo-900">
+      <Navbar />
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white/90 border border-indigo-100 rounded-2xl shadow-lg p-6 sm:p-8">
+          <header className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-indigo-800">
+              Account Addition
+            </h1>
+            <p className="text-indigo-700/70 mt-1">
+              Create or update customer account details.
+            </p>
+          </header>
 
-      {/* Form Card */}
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="mx-auto max-w-xl rounded-2xl shadow-lg bg-white/90 border border-indigo-100 p-6">
-          <p className="text-sm text-indigo-600 mb-4">
-            Create a new application user. The password is sent to your AWS API; the Lambda hashes it (bcrypt) and stores it in DynamoDB.
-          </p>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <section>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-indigo-800 mb-1">
+                    Account Number<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.accountNumber}
+                    onChange={onChange("accountNumber")}
+                    className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    placeholder="e.g. 1001-AB"
+                  />
+                </div>
 
-          {msg.text ? (
-            <div
-              className={`mb-4 rounded-lg px-4 py-3 text-sm ${
-                msg.type === "success"
-                  ? "bg-green-50 text-green-700 border border-green-200"
-                  : "bg-red-50 text-red-700 border border-red-200"
-              }`}
-            >
-              {msg.text}
-            </div>
-          ) : null}
+                <div>
+                  <label className="block text-sm font-medium text-indigo-800 mb-1">
+                    Name<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={onChange("name")}
+                    className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    placeholder="John Doe"
+                  />
+                </div>
 
-          <form onSubmit={signup} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">User ID</label>
-              <input
-                type="text"
-                value={form.userId}
-                onChange={update("userId")}
-                placeholder="e.g. arghya"
-                className="w-full rounded-lg border border-indigo-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                autoFocus
-              />
-            </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-indigo-800 mb-1">
+                    Address
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={form.address}
+                    onChange={onChange("address")}
+                    className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    placeholder="Street, City"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
-              <div className="relative">
-                <input
-                  type={showPwd ? "text" : "password"}
-                  value={form.password}
-                  onChange={update("password")}
-                  placeholder="Enter password"
-                  className="w-full rounded-lg border border-indigo-200 px-3 py-2 pr-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPwd((s) => !s)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs px-2 py-1 border border-indigo-200 rounded-md hover:bg-indigo-50"
-                >
-                  {showPwd ? "Hide" : "Show"}
-                </button>
+                <div>
+                  <label className="block text-sm font-medium text-indigo-800 mb-1">
+                    State / Province
+                  </label>
+                  <input
+                    type="text"
+                    value={form.state}
+                    onChange={onChange("state")}
+                    className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    placeholder="CA"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-indigo-800 mb-1">
+                    Country
+                  </label>
+                  <input
+                    type="text"
+                    value={form.country}
+                    onChange={onChange("country")}
+                    className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    placeholder="USA"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-indigo-800 mb-1">
+                    ZIP / Postal
+                  </label>
+                  <input
+                    type="text"
+                    value={form.zip}
+                    onChange={onChange("zip")}
+                    className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    placeholder="10001"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-indigo-800 mb-1">
+                    Contact
+                  </label>
+                  <input
+                    type="text"
+                    value={form.contact}
+                    onChange={onChange("contact")}
+                    className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
               </div>
-              <p className="mt-1 text-xs text-indigo-500">Min 6 chars. You can tighten policy later.</p>
-            </div>
+            </section>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Confirm Password</label>
-              <input
-                type={showPwd ? "text" : "password"}
-                value={form.confirm}
-                onChange={update("confirm")}
-                placeholder="Re-enter password"
-                className="w-full rounded-lg border border-indigo-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
+            {msg && (
+              <div
+                className={`rounded-lg p-3 text-sm ${
+                  msg.type === "success"
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "bg-red-50 text-red-600 border border-red-200"
+                }`}
+              >
+                {msg.text}
+              </div>
+            )}
 
-            <div className="pt-2 flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <button
                 type="submit"
-                disabled={loading}
-                className="rounded-lg bg-indigo-600 text-white px-4 py-2 hover:bg-indigo-700 disabled:opacity-50"
+                disabled={saving}
+                className="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-70"
               >
-                {loading ? "Creating..." : "Create User"}
+                {saving ? "Saving..." : "Save Account"}
               </button>
               <button
                 type="button"
-                onClick={() => setForm({ userId: "", password: "", confirm: "" })}
-                className="rounded-lg border border-indigo-200 px-4 py-2 hover:bg-indigo-50"
+                onClick={resetForm}
+                className="inline-flex items-center rounded-lg border border-indigo-200 px-4 py-2 text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-200"
               >
                 Reset
               </button>
@@ -177,9 +237,8 @@ export default function AccountAdd() {
           </form>
         </div>
 
-        {/* Footer */}
-        <footer className="mt-10 text-center text-sm text-indigo-500">
-          © 2025 PSSPOC — Built with ❤️ using React & Tailwind CSS
+        <footer className="text-center text-xs text-indigo-700/60 mt-6">
+          © 2025 PSSPOC — Built with ❤️ using React &amp; Tailwind CSS
         </footer>
       </main>
     </div>
